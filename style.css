@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: linear-gradient(135deg, #ff4b91 0%, #ff9a9e 50%, #fecfef 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 550px;
+    border: 4px solid #ff4b91;
+    text-align: center;
+}
+
+h1 {
+    color: #ff4b91;
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    color: #ff4b91;
+    margin: 10px 0 5px 5px;
+    font-size: 0.85rem;
+}
+
+select, textarea, input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ffdeeb;
+    border-radius: 15px;
+    background-color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+select:focus, textarea:focus, input:focus {
+    outline: none;
+    border-color: #ff4b91;
+    box-shadow: 0 0 12px rgba(255, 75, 145, 0.2);
+}
+
+textarea {
+    height: 110px;
+    resize: none;
+    font-weight: 500;
+}
+
+.btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #ff4b91;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #ffb2d9;
+    color: #ff4b91;
+}
+
+.btn-reset {
+    grid-column: span 2;
+    background-color: #2d3436;
+    color: white;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
+    box-shadow: 0 8px 15px rgba(255, 75, 145, 0.3);
+}
+
+h3 {
+    margin-top: 25px;
+    color: #ff4b91;
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+#outputBelva {
+    background-color: #fff0f6;
+    border: 2px dashed #ff4b91;
+    color: #d63384;
+    font-weight: 700;
+}

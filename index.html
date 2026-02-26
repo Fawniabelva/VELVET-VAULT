@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Vault | Secure in Pink</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="glass-card">
+    <h1>VELVET VAULT 🌷🌸</h1>
+    <p class="subtitle">HAII CANTIKKK!!!</p>
+
+    <div class="input-section">
+        <label for="pilihCipher">Pilih Algoritma:</label>
+        <select id="pilihCipher">
+            <option value="vigenere">Vigenere Cipher</option>
+            <option value="affine">Affine Cipher</option>
+            <option value="playfair">Playfair Cipher</option>
+            <option value="hill">Hill Cipher (2x2)</option>
+            <option value="enigma">Enigma Machine</option>
+        </select>
+
+        <textarea id="inputBelva" placeholder="Masukkan teks di sini..."></textarea>
+
+        <label for="keyBelva">Kunci / Parameter:</label>
+        <input type="text" id="keyBelva" placeholder="Contoh: SECRET atau 3,5 atau 1,2,3,4">
+
+        <div class="btn-grid">
+            <button class="btn-primary" onclick="BelvaEngine.encryptNow()">✨ ENKRIPSI</button>
+            <button class="btn-secondary" onclick="BelvaEngine.decryptNow()">🔓 DEKRIPSI</button>
+            <button class="btn-reset" onclick="BelvaEngine.resetAll()">RESET</button>
+        </div>
+    </div>
+
+    <div class="output-section">
+        <h3>Hasil:</h3>
+        <textarea id="outputBelva" readonly placeholder="Hasil akan muncul di sini..."></textarea>
+    </div>
+</div>
+
+<script src="belva-engine.js"></script>
+
+</body>
+</html>
