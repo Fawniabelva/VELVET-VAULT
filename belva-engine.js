@@ -21,9 +21,10 @@ const BelvaEngine = {
         return null;
     },
 
-    /* VIGENERE */
+
     vigenereEnc(teks,key){
-        teks=this.bersihkan(teks); key=this.bersihkan(key);
+        teks=this.bersihkan(teks);
+        key=this.bersihkan(key);
         if(key.length==0) return "KEY KOSONG!";
         let hasil="";
         for(let i=0;i<teks.length;i++){
@@ -35,7 +36,8 @@ const BelvaEngine = {
     },
 
     vigenereDec(teks,key){
-        teks=this.bersihkan(teks); key=this.bersihkan(key);
+        teks=this.bersihkan(teks);
+        key=this.bersihkan(key);
         if(key.length==0) return "KEY KOSONG!";
         let hasil="";
         for(let i=0;i<teks.length;i++){
@@ -46,11 +48,11 @@ const BelvaEngine = {
         return hasil;
     },
 
-    /* AFFINE */
+/* ================= AFFINE ================= */
+
     affineEnc(teks,a,b){
         teks=this.bersihkan(teks);
-        if(isNaN(a)||isNaN(b)) return "FORMAT KEY SALAH! (Gunakan a,b)";
-        if(this.fpb(a,26)!=1) return "NILAI 'A' TIDAK VALID!";
+        if(this.fpb(a,26)!=1) return "NILAI A TIDAK VALID!";
         let hasil="";
         for(let h of teks){
             let p=this.hurufSet.indexOf(h);
@@ -62,7 +64,7 @@ const BelvaEngine = {
     affineDec(teks,a,b){
         teks=this.bersihkan(teks);
         let inv=this.inversMod(a,26);
-        if(!inv) return "TIDAK ADA INVERS MODULO!";
+        if(!inv) return "TIDAK ADA INVERS!";
         let hasil="";
         for(let h of teks){
             let c=this.hurufSet.indexOf(h);
@@ -71,105 +73,199 @@ const BelvaEngine = {
         return hasil;
     },
 
-    /* PLAYFAIR */
+
     buatMatrix(key){
         key=this.bersihkan(key).replace(/J/g,"I");
         let gabungan="";
-        for(let h of key){ if(!gabungan.includes(h)) gabungan+=h; }
+        for(let h of key){
+            if(!gabungan.includes(h)) gabungan+=h;
+        }
         for(let h of this.hurufSet){
             if(h!="J" && !gabungan.includes(h)) gabungan+=h;
         }
         return gabungan;
     },
 
-    playfair(teks,key,mode){
+    preparePlayfairText(teks){
         teks=this.bersihkan(teks).replace(/J/g,"I");
-        if(key.length==0) return "KEY KOSONG!";
-        let matrix=this.buatMatrix(key);
         let hasil="";
-        for(let i=0;i<teks.length;i+=2){
+        for(let i=0;i<teks.length;i++){
             let a=teks[i];
-            let b=teks[i+1]||"X";
-            if(a==b) b="X";
-            let posA=matrix.indexOf(a), posB=matrix.indexOf(b);
-            let rA=Math.floor(posA/5), cA=posA%5;
-            let rB=Math.floor(posB/5), cB=posB%5;
-            if(mode=="enc"){
-                if(rA==rB){ hasil+=matrix[rA*5+this.modAman(cA+1,5)] + matrix[rB*5+this.modAman(cB+1,5)]; }
-                else if(cA==cB){ hasil+=matrix[this.modAman(rA+1,5)*5+cA] + matrix[this.modAman(rB+1,5)*5+cB]; }
-                else { hasil+=matrix[rA*5+cB] + matrix[rB*5+cA]; }
-            } else {
-                if(rA==rB){ hasil+=matrix[rA*5+this.modAman(cA-1,5)] + matrix[rB*5+this.modAman(cB-1,5)]; }
-                else if(cA==cB){ hasil+=matrix[this.modAman(rA-1,5)*5+cA] + matrix[this.modAman(rB-1,5)*5+cB]; }
-                else { hasil+=matrix[rA*5+cB] + matrix[rB*5+cA]; }
+            let b=teks[i+1];
+            if(a===b){
+                hasil+=a+"X";
+            }else if(b){
+                hasil+=a+b;
+                i++;
+            }else{
+                hasil+=a+"X";
             }
         }
         return hasil;
     },
 
-    /* HILL */
-    hillEnc(teks,key){
-        teks=this.bersihkan(teks);
-        let k=key.split(",").map(Number);
-        if(k.length!=4) return "KEY HARUS 4 ANGKA!";
-        let det=this.modAman(k[0]*k[3]-k[1]*k[2],26);
-        if(this.fpb(det,26)!=1) return "DETERMINAN TIDAK PUNYA INVERS!";
+    playfair(teks,key,mode){
+        if(key.length==0) return "KEY KOSONG!";
+        let matrix=this.buatMatrix(key);
+        if(mode==="enc") teks=this.preparePlayfairText(teks);
+        else teks=this.bersihkan(teks).replace(/J/g,"I");
+
         let hasil="";
         for(let i=0;i<teks.length;i+=2){
-            let p1=this.hurufSet.indexOf(teks[i]), p2=this.hurufSet.indexOf(teks[i+1]||"X");
-            hasil+=this.hurufSet[this.modAman(k[0]*p1+k[1]*p2,26)];
-            hasil+=this.hurufSet[this.modAman(k[2]*p1+k[3]*p2,26)];
+            let a=teks[i], b=teks[i+1];
+            let posA=matrix.indexOf(a), posB=matrix.indexOf(b);
+            let rA=Math.floor(posA/5), cA=posA%5;
+            let rB=Math.floor(posB/5), cB=posB%5;
+
+            if(mode==="enc"){
+                if(rA===rB){
+                    hasil+=matrix[rA*5+((cA+1)%5)];
+                    hasil+=matrix[rB*5+((cB+1)%5)];
+                }else if(cA===cB){
+                    hasil+=matrix[((rA+1)%5)*5+cA];
+                    hasil+=matrix[((rB+1)%5)*5+cB];
+                }else{
+                    hasil+=matrix[rA*5+cB];
+                    hasil+=matrix[rB*5+cA];
+                }
+            }else{
+                if(rA===rB){
+                    hasil+=matrix[rA*5+((cA+4)%5)];
+                    hasil+=matrix[rB*5+((cB+4)%5)];
+                }else if(cA===cB){
+                    hasil+=matrix[((rA+4)%5)*5+cA];
+                    hasil+=matrix[((rB+4)%5)*5+cB];
+                }else{
+                    hasil+=matrix[rA*5+cB];
+                    hasil+=matrix[rB*5+cA];
+                }
+            }
         }
         return hasil;
     },
 
-    hillDec(teks,key){
+
+    rotorI: "EKMFLGDQVZNTOWYHXUSPAIBRCJ",
+    rotorII: "AJDKSIRUXBLHWTMCQGZNPYFVOE",
+    rotorIII: "BDFHJLCPRTXVZNYEIWGAKMUSQO",
+    reflectorB: "YRUHQSLDPXNGOKMIEBFZCWVJAT",
+
+    enigmaProses(teks,key){
+        teks=this.bersihkan(teks);
+        key=this.bersihkan(key);
+        if(key.length!==3) return "KEY ENIGMA HARUS 3 HURUF!";
+
+        let hasil="";
+        let pos1=this.hurufSet.indexOf(key[0]);
+        let pos2=this.hurufSet.indexOf(key[1]);
+        let pos3=this.hurufSet.indexOf(key[2]);
+
+        for(let huruf of teks){
+
+            pos1=(pos1+1)%26;
+
+            let idx=this.hurufSet.indexOf(huruf);
+
+            idx=(idx+pos1)%26;
+            idx=this.hurufSet.indexOf(this.rotorI[idx]);
+            idx=this.modAman(idx-pos1,26);
+
+            idx=(idx+pos2)%26;
+            idx=this.hurufSet.indexOf(this.rotorII[idx]);
+            idx=this.modAman(idx-pos2,26);
+
+            idx=(idx+pos3)%26;
+            idx=this.hurufSet.indexOf(this.rotorIII[idx]);
+            idx=this.modAman(idx-pos3,26);
+
+            idx=this.hurufSet.indexOf(this.reflectorB[idx]);
+
+            idx=(idx+pos3)%26;
+            idx=this.rotorIII.indexOf(this.hurufSet[idx]);
+            idx=this.modAman(idx-pos3,26);
+
+            idx=(idx+pos2)%26;
+            idx=this.rotorII.indexOf(this.hurufSet[idx]);
+            idx=this.modAman(idx-pos2,26);
+
+            idx=(idx+pos1)%26;
+            idx=this.rotorI.indexOf(this.hurufSet[idx]);
+            idx=this.modAman(idx-pos1,26);
+
+            hasil+=this.hurufSet[idx];
+        }
+
+        return hasil;
+    },
+
+
+    hill2x2Enc(teks,key){
         teks=this.bersihkan(teks);
         let k=key.split(",").map(Number);
-        if(k.length!=4) return "KEY HARUS 4 ANGKA!";
-        let det=this.modAman(k[0]*k[3]-k[1]*k[2],26);
-        let detInv=this.inversMod(det,26);
-        if(!detInv) return "TIDAK ADA INVERS MATRIKS!";
-        let inv=[this.modAman(detInv*k[3],26), this.modAman(-detInv*k[1],26), this.modAman(-detInv*k[2],26), this.modAman(detInv*k[0],26)];
+        if(k.length!==4) return "KEY HARUS 4 ANGKA! Contoh: 3,3,2,5";
+
+        let a=k[0], b=k[1], c=k[2], d=k[3];
+
+        if(teks.length%2!==0) teks+="X";
+
         let hasil="";
         for(let i=0;i<teks.length;i+=2){
-            let c1=this.hurufSet.indexOf(teks[i]), c2=this.hurufSet.indexOf(teks[i+1]);
-            hasil+=this.hurufSet[this.modAman(inv[0]*c1+inv[1]*c2,26)];
-            hasil+=this.hurufSet[this.modAman(inv[2]*c1+inv[3]*c2,26)];
+            let x=this.hurufSet.indexOf(teks[i]);
+            let y=this.hurufSet.indexOf(teks[i+1]);
+
+            let r1=this.modAman(a*x+b*y,26);
+            let r2=this.modAman(c*x+d*y,26);
+
+            hasil+=this.hurufSet[r1]+this.hurufSet[r2];
         }
         return hasil;
     },
 
-    /* ENIGMA */
-    rotor: "EKMFLGDQVZNTOWYHXUSPAIBRCJ",
-    reflector: "YRUHQSLDPXNGOKMIEBFZCWVJAT",
-    enigmaProses(teks){
+    hill2x2Dec(teks,key){
         teks=this.bersihkan(teks);
-        let hasil="", geser=0;
-        for(let h of teks){
-            let index=this.hurufSet.indexOf(h);
-            let masuk=this.modAman(index+geser,26);
-            let step1=this.rotor[masuk];
-            let reflect=this.reflector[this.hurufSet.indexOf(step1)];
-            let keluarIndex=this.rotor.indexOf(reflect);
-            let finalIndex=this.modAman(keluarIndex-geser,26);
-            hasil+=this.hurufSet[finalIndex];
-            geser=(geser+1)%26;
+        let k=key.split(",").map(Number);
+        if(k.length!==4) return "KEY HARUS 4 ANGKA!";
+
+        let a=k[0], b=k[1], c=k[2], d=k[3];
+
+        let det=this.modAman(a*d-b*c,26);
+        let invDet=this.inversMod(det,26);
+        if(invDet==null) return "Determinan tidak punya invers mod 26!";
+
+        let A=this.modAman(d*invDet,26);
+        let B=this.modAman(-b*invDet,26);
+        let C=this.modAman(-c*invDet,26);
+        let D=this.modAman(a*invDet,26);
+
+        let hasil="";
+        for(let i=0;i<teks.length;i+=2){
+            let x=this.hurufSet.indexOf(teks[i]);
+            let y=this.hurufSet.indexOf(teks[i+1]);
+
+            let r1=this.modAman(A*x+B*y,26);
+            let r2=this.modAman(C*x+D*y,26);
+
+            hasil+=this.hurufSet[r1]+this.hurufSet[r2];
         }
         return hasil;
     },
 
-    /* CONTROLLER */
+
     encryptNow(){
         let mode=document.getElementById("pilihCipher").value;
         let teks=document.getElementById("inputBelva").value;
         let key=document.getElementById("keyBelva").value;
         let output="";
+
         if(mode=="vigenere") output=this.vigenereEnc(teks,key);
-        else if(mode=="affine"){ let p=key.split(","); output=this.affineEnc(teks,parseInt(p[0]),parseInt(p[1])); }
+        else if(mode=="affine"){ 
+            let p=key.split(","); 
+            output=this.affineEnc(teks,parseInt(p[0]),parseInt(p[1])); 
+        }
         else if(mode=="playfair") output=this.playfair(teks,key,"enc");
-        else if(mode=="hill") output=this.hillEnc(teks,key);
-        else if(mode=="enigma") output=this.enigmaProses(teks);
+        else if(mode=="enigma") output=this.enigmaProses(teks,key);
+        else if(mode=="hill") output=this.hill2x2Enc(teks,key);
+
         document.getElementById("outputBelva").value=output;
     },
 
@@ -178,11 +274,16 @@ const BelvaEngine = {
         let teks=document.getElementById("inputBelva").value;
         let key=document.getElementById("keyBelva").value;
         let output="";
+
         if(mode=="vigenere") output=this.vigenereDec(teks,key);
-        else if(mode=="affine"){ let p=key.split(","); output=this.affineDec(teks,parseInt(p[0]),parseInt(p[1])); }
+        else if(mode=="affine"){ 
+            let p=key.split(","); 
+            output=this.affineDec(teks,parseInt(p[0]),parseInt(p[1])); 
+        }
         else if(mode=="playfair") output=this.playfair(teks,key,"dec");
-        else if(mode=="hill") output=this.hillDec(teks,key);
-        else if(mode=="enigma") output=this.enigmaProses(teks);
+        else if(mode=="enigma") output=this.enigmaProses(teks,key);
+        else if(mode=="hill") output=this.hill2x2Dec(teks,key);
+
         document.getElementById("outputBelva").value=output;
     },
 
@@ -191,4 +292,5 @@ const BelvaEngine = {
         document.getElementById("outputBelva").value="";
         document.getElementById("keyBelva").value="";
     }
+
 };

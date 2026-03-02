@@ -13,6 +13,7 @@
     <p class="subtitle">HAII CANTIKKK!!!</p>
 
     <div class="input-section">
+
         <label for="pilihCipher">Pilih Algoritma:</label>
         <select id="pilihCipher">
             <option value="vigenere">Vigenere Cipher</option>
@@ -25,13 +26,15 @@
         <textarea id="inputBelva" placeholder="Masukkan teks di sini..."></textarea>
 
         <label for="keyBelva">Kunci / Parameter:</label>
-        <input type="text" id="keyBelva" placeholder="Contoh: SECRET atau 3,5 atau 1,2,3,4">
+        <input type="text" id="keyBelva" 
+        placeholder="Vigenere: SECRET | Affine: 5,8 | Hill: 3,3,2,5 | Enigma: AAA">
 
         <div class="btn-grid">
             <button class="btn-primary" onclick="BelvaEngine.encryptNow()">✨ ENKRIPSI</button>
             <button class="btn-secondary" onclick="BelvaEngine.decryptNow()">🔓 DEKRIPSI</button>
             <button class="btn-reset" onclick="BelvaEngine.resetAll()">RESET</button>
         </div>
+
     </div>
 
     <div class="output-section">
@@ -41,6 +44,29 @@
 </div>
 
 <script src="belva-engine.js"></script>
+
+<script>
+document.getElementById("pilihCipher").addEventListener("change", function(){
+    const keyInput = document.getElementById("keyBelva");
+    const value = this.value;
+
+    if(value === "enigma"){
+        keyInput.placeholder = "Contoh: AAA (3 huruf)";
+    }
+    else if(value === "hill"){
+        keyInput.placeholder = "Contoh: 3,3,2,5";
+    }
+    else if(value === "affine"){
+        keyInput.placeholder = "Contoh: 5,8";
+    }
+    else if(value === "vigenere"){
+        keyInput.placeholder = "Contoh: SECRET";
+    }
+    else if(value === "playfair"){
+        keyInput.placeholder = "Contoh: BELVA";
+    }
+});
+</script>
 
 </body>
 </html>
